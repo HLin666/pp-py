@@ -1,5 +1,3 @@
-import rasterio
-
 class RasterioUtils:
     def lonlat_to_pixel(transform, lon, lat):
         """将经纬度转换为栅格的行列索引"""

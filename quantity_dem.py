@@ -77,8 +77,9 @@ class QuantityDem:
         return map
 
 if __name__ == '__main__':
-    map = QuantityDem.quantity_dem(r"/home/cc/mydata/玄武区dem.tif", resolution=12)
-    print(f"地图大小:", len(map.cells))
+    map = QuantityDem.quantity_dem(r"/home/cc/mydata/玄武区dem.tif", resolution=11)
+    map.attributes.append("高程")
+    map.attributes.append("坡度")
 
     # 将 map 对象序列化并写入二进制文件
     with open('玄武区.bin', 'wb') as f:
