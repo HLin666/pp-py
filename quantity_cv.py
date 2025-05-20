@@ -50,6 +50,8 @@ class QuantityCV:
                         sd = stdev(elevations)     # 标准差
                         cv = ElevationCoefficientOfVariation(round(sd / avg, 4) if avg != 0 else None)
                         cell.attribute.append(cv)
+                    else:
+                        cell.attribute.append(ElevationCoefficientOfVariation(None))
             # 邻域法
             else:
                 for cell in tqdm(map.cells.values(), desc="量化高程变异系数: "):
@@ -71,19 +73,24 @@ class QuantityCV:
                         sd = stdev(elevations)     # 标准差
                         cv = ElevationCoefficientOfVariation(round(sd / avg, 4) if avg != 0 else None)
                         cell.attribute.append(cv)
+                    else:
+                        cell.attribute.append(ElevationCoefficientOfVariation(None))
+            
+            # 记录属性
+            map.attributes.append("高程变异系数")
+
             return map
 
 if __name__ == '__main__':
     # 读取地图对象
-    with open('玄武区.bin', 'rb') as f:
+    with open('data/玄武区.bin', 'rb') as f:
         map = pickle.load(f)
     print(f"该map中现有属性:", map.attributes)
     
     # 量化高程变异系数
     map = QuantityCV.quantity_cv(map, r"/home/cc/mydata/玄武区dem.tif", mask=False)
-    map.attributes.append("高程变异系数")
 
     # 将 map 对象序列化并写入二进制文件
-    with open('玄武区.bin', 'wb') as f:
+    with open('data/玄武区.bin', 'wb') as f:
         pickle.dump(map, f)
             

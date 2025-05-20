@@ -49,6 +49,9 @@ class QuantityRoughness:
                         sd = stdev(elevations)
                         roughness = Roughness(sd)
                         cell.attribute.append(roughness)
+                    else:
+                        roughness = Roughness(0)
+                        cell.attribute.append(roughness)
             # 邻域法
             else:
                 for cell in tqdm(map.cells.values(), desc="量化地形粗糙度: "):
@@ -69,19 +72,25 @@ class QuantityRoughness:
                         sd = stdev(elevations)
                         roughness = Roughness(sd)
                         cell.attribute.append(roughness)
+                    else:
+                        roughness = Roughness(0)
+                        cell.attribute.append(roughness)
+            
+            # 记录属性
+            map.attributes.append("地形粗糙度")
+            
             return map
 
 if __name__ == '__main__':
     # 读取地图对象
-    with open('玄武区.bin', 'rb') as f:
+    with open('data/玄武区.bin', 'rb') as f:
         map = pickle.load(f)
     print(f"该map中现有属性:", map.attributes)
     
     # 量化地形粗糙度
     map = QuantityRoughness.quantity_dem(map, r"/home/cc/mydata/玄武区dem.tif", mask=False)
-    map.attributes.append("地形粗糙度")
 
     # 将 map 对象序列化并写入二进制文件
-    with open('玄武区.bin', 'wb') as f:
+    with open('data/玄武区.bin', 'wb') as f:
         pickle.dump(map, f)
             

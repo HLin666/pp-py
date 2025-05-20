@@ -55,3 +55,21 @@ class TerrainType(Enum):
     SNOW = 7     # 雪、冰
     WATER = 8    # 水体
     WETLAND = 9  # 湿地
+
+class StringConstant(Enum):
+    """
+    字符串常量枚举类
+    """
+    ELEVATION = "高程"
+    SLOPE = "坡度"
+    CV = "高程变异系数"
+    RELIEF = "地形起伏度"
+    ROUGHNESS = "地形粗糙度"
+
+class AttributeIndex(Enum):
+    """
+    属性索引枚举类
+    """
+    CV = 0
+    RELIEF = 1
+    ROUGHNESS = 2

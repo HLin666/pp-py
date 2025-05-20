@@ -47,6 +47,9 @@ class QuantityRelief:
                     if len(elevations) >= 2:
                         relief = Relief(max(elevations) - min(elevations))
                         cell.attribute.append(relief)
+                    else:
+                        relief = Relief(0)
+                        cell.attribute.append(relief)
             # 邻域法
             else:
                 for cell in tqdm(map.cells.values(), desc="量化地形起伏度: "):
@@ -66,19 +69,25 @@ class QuantityRelief:
                     if len(elevations) >= 2:
                         relief = Relief(max(elevations) - min(elevations))
                         cell.attribute.append(relief)
+                    else:
+                        relief = Relief(0)
+                        cell.attribute.append(relief)
+            
+            # 记录属性
+            map.attributes.append("地形起伏度")
+
             return map
 
 if __name__ == '__main__':
     # 读取地图对象
-    with open('玄武区.bin', 'rb') as f:
+    with open('data/玄武区.bin', 'rb') as f:
         map = pickle.load(f)
     print(f"该map中现有属性:", map.attributes)
     
     # 量化地形粗糙度
     map = QuantityRelief.quantity_relief(map, r"/home/cc/mydata/玄武区dem.tif", mask=False)
-    map.attributes.append("地形起伏度")
 
     # 将 map 对象序列化并写入二进制文件
-    with open('玄武区.bin', 'wb') as f:
+    with open('data/玄武区.bin', 'wb') as f:
         pickle.dump(map, f)
             

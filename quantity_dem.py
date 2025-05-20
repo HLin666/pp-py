@@ -70,17 +70,20 @@ class QuantityDem:
             center_slope = QuantityDem.calculate_center_slope(h, vertex_elevation, center_elev)
 
             # 填充 cell对象并添加到Map
+
             cell.elevation = center_elev
             cell.slope = center_slope
             map.add_cell(cell)
+
+        # 记录属性
+        map.attributes.append("高程")
+        map.attributes.append("坡度")
 
         return map
 
 if __name__ == '__main__':
     map = QuantityDem.quantity_dem(r"/home/cc/mydata/玄武区dem.tif", resolution=11)
-    map.attributes.append("高程")
-    map.attributes.append("坡度")
 
     # 将 map 对象序列化并写入二进制文件
-    with open('玄武区.bin', 'wb') as f:
+    with open('data/玄武区.bin', 'wb') as f:
         pickle.dump(map, f)  # 使用 pickle.dump 序列化对象
