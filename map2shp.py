@@ -28,6 +28,7 @@ def write_cells_to_shp(map, shp_path):
         shp.field("elevation", "F", decimal=2)
         shp.field("slope", "F", decimal=2)
         shp.field("terrain", "N", decimal=0)
+        shp.field("road_topology_type", "N", decimal=0)
 
         # 动态定义字段
         defined_fields = set()
@@ -51,6 +52,7 @@ def write_cells_to_shp(map, shp_path):
                 cell.elevation,
                 cell.slope,
                 max(cell.terrain, key=cell.terrain.get) if cell.terrain else None,
+                cell.road_topology_type,
             ]
             for attr in cell.attribute:
                 if isinstance(attr, ElevationCoefficientOfVariation):
@@ -70,14 +72,16 @@ def write_cells_to_shp(map, shp_path):
 
 if __name__ == "__main__":
     # 反序列化 map 对象
-    with open('玄武区.bin', 'rb') as f:
+    # with open('data/玄武区.bin', 'rb') as f:
+    with open('data/path.bin', 'rb') as f:
         map = pickle.load(f)
 
     print(f"该 map 中现有属性: {', '.join(map.attributes)}")
 
-    output_dir = "output_shp"
+    output_dir = "data/output_shp"
     os.makedirs(output_dir, exist_ok=True)
-    shp_path = os.path.join(output_dir, "玄武区.shp")
+    # shp_path = os.path.join(output_dir, "玄武区.shp")
+    shp_path = os.path.join(output_dir, "path2.shp")
 
     write_cells_to_shp(map, shp_path)
     print(f"Shapefile 已写入: {shp_path}")

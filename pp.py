@@ -24,14 +24,22 @@ def init_attributes_index(map):
             attributes_index[AttributeIndex.ROUGHNESS.value]=i-flag
     return attributes_index
 
-def reject_cell_by_cv(cell, cv_index, cv_threshold):
-    if cell.attribute[cv_index].value == None:
+def reject_cell_by_cv(neighbor_cell, cv_index, cv_threshold):
+    if neighbor_cell.attribute[cv_index].value == None:
         return True
-    if cv_index != -1 and cell.attribute[cv_index].value > cv_threshold:
+    if cv_index != -1 and neighbor_cell.attribute[cv_index].value > cv_threshold:
         return True
     return False
 
-def reject_cell(cell, attributes_index):
+def reject_cell_by_road(current_cell, neighbor_cell):
+    if current_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.NOWAY.value:
+        return True
+    elif current_cell.road_topology_type == RoadTopologyType.NOWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value:
+        return True
+    else:
+        return False
+
+def reject_cell(current_cell, neighbor_cell, attributes_index):
     """
     判断一个cell是否被拒绝
     :param cell: Cell对象
@@ -42,10 +50,30 @@ def reject_cell(cell, attributes_index):
     # 模拟阈值
     cv_threshold = 0.1
     cv_index = attributes_index[AttributeIndex.CV.value]
-    if reject_cell_by_cv(cell, cv_index, cv_threshold):
+    if reject_cell_by_cv(neighbor_cell, cv_index, cv_threshold):
+        return True
+    if reject_cell_by_road(current_cell, neighbor_cell):
         return True
     return False
-    
+
+def has_passable_road(current_cell, neighbor_cell):
+    """
+    判断一个cell是否有可通行的道路
+    :param current_cell: 当前cell
+    :param neighbor_cell: 邻接cell
+    :return: bool
+    """
+    if current_cell.road_topology_type == RoadTopologyType.NOWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.CONNECTEDWAY.value:
+        return True
+    elif current_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value:
+        return True
+    elif current_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.CONNECTEDWAY.value:
+        return True
+    elif current_cell.road_topology_type == RoadTopologyType.CONNECTEDWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value:
+        return True
+    elif current_cell.road_topology_type == RoadTopologyType.CONNECTEDWAY.value and neighbor_cell.road_topology_type == RoadTopologyType.CONNECTEDWAY.value:
+        return True
+    return False
 
 
 def pp(map, start, end):
@@ -101,11 +129,15 @@ def pp(map, start, end):
         closed_set.add(current_cell)
         for neighbor in current_cell.neighbors:
             if neighbor in map.cells and map.cells[neighbor] not in closed_set:
-                # 检查坡度是否超过阈值
-                if reject_cell(map.cells[neighbor], attributes_index):
+                # 执行拒绝策略
+                if has_passable_road(current_cell, map.cells[neighbor]):
+                    pass # 有可供通行的道路，无需考虑其他的限制，凌驾一切
+                elif reject_cell(current_cell, map.cells[neighbor], attributes_index):
                     continue
                 # 计算g值
                 g = current_cell.g + h3.point_dist(current_cell.center, map.cells[neighbor].center)
+                if has_passable_road(current_cell, map.cells[neighbor]):
+                    g *= 0.1
                 if map.cells[neighbor] not in open_set or g < map.cells[neighbor].g:
                     map.cells[neighbor].g = g
                     map.cells[neighbor].h = h3.point_dist(map.cells[neighbor].center, end_cell.center)

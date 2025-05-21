@@ -73,3 +73,11 @@ class AttributeIndex(Enum):
     CV = 0
     RELIEF = 1
     ROUGHNESS = 2
+
+class RoadTopologyType(Enum):
+    """
+    道路拓扑类型枚举类
+    """
+    NOWAY = 0 # 无道路
+    ISOLATEDWAY = 1 # 不可穿越的道路
+    CONNECTEDWAY = 2 # 可穿越的道路

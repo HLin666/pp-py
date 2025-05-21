@@ -1,5 +1,6 @@
 import h3
 from abc import ABC, abstractmethod
+from pp_enum import *
 
 class Map:
     def __init__(self):
@@ -24,12 +25,11 @@ class Cell:
         self.init_center()            # 初始化格心坐标
 
         # 拓扑关系
-        self.neighbors = []           # 邻接单元数组 (存储Cell对象)
+        self.neighbors = []           # 邻接单元数组 (存储索引)
         self.init_neighbor()          # 初始化cell的邻接cell的索引
 
-        # 矢量量化属性
-        self.highway_edges = []       # 公路通行边数组 (bool列表，索引对应neighbors)
-        self.has_highway = False      # 是否包含公路
+        # 道路矢量量化拓扑属性
+        self.road_topology_type = RoadTopologyType.NOWAY.value   # 道路拓扑类型，0-无道路，1-不可穿越的道路，2-可穿越的道路
 
         # dem量化属性
         self.elevation = None         # 高程值
@@ -38,6 +38,12 @@ class Cell:
 
         # 其他属性
         self.attribute = []           # 属性数组 (存储Attribute对象)
+
+        # pp相关
+        self.g = 0
+        self.h = 0
+        self.f = 0
+        self.father = None
 
     def init_center(self):
         """
