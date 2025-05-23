@@ -65,6 +65,8 @@ class StringConstant(Enum):
     CV = "高程变异系数"
     RELIEF = "地形起伏度"
     ROUGHNESS = "地形粗糙度"
+    CURVATURE = "曲率"
+    EXPOSURE = "坡向"
 
 class AttributeIndex(Enum):
     """
@@ -73,6 +75,8 @@ class AttributeIndex(Enum):
     CV = 0
     RELIEF = 1
     ROUGHNESS = 2
+    CURVATURE = 3
+    EXPOSURE = 4
 
 class RoadTopologyType(Enum):
     """

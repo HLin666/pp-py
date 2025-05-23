@@ -43,6 +43,12 @@ def write_cells_to_shp(map, shp_path):
                 elif isinstance(attr, Relief) and "relief" not in defined_fields:
                     shp.field("relief", "F", decimal=2)
                     defined_fields.add("relief")
+                elif isinstance(attr, Curvature) and "curvature" not in defined_fields:
+                    shp.field("curvature", "F", decimal=2)
+                    defined_fields.add("curvature")
+                elif isinstance(attr, Exposure) and "exposure" not in defined_fields:
+                    shp.field("exposure", "F", decimal=2)
+                    defined_fields.add("exposure")
 
         # 遍历 Map 中的 Cell 对象
         for cell in tqdm(map.cells.values(), desc="将map转为shp"):
@@ -60,6 +66,10 @@ def write_cells_to_shp(map, shp_path):
                 elif isinstance(attr, Roughness):
                     record.append(attr.value)
                 elif isinstance(attr, Relief):
+                    record.append(attr.value)
+                elif isinstance(attr, Curvature):
+                    record.append(attr.value)
+                elif isinstance(attr, Exposure):
                     record.append(attr.value)
 
             shp.record(*record)

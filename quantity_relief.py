@@ -4,6 +4,7 @@ from rasterio import features
 from rasterio_utils import RasterioUtils
 from attribute_structures import Relief
 from tqdm import tqdm
+from pp_enum import *
 
 class QuantityRelief:
     """
@@ -74,7 +75,7 @@ class QuantityRelief:
                         cell.attribute.append(relief)
             
             # 记录属性
-            map.attributes.append("地形起伏度")
+            map.attributes.append(StringConstant.RELIEF.value)
 
             return map
 

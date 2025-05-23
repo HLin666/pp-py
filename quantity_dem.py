@@ -4,6 +4,7 @@ from rasterio_utils import RasterioUtils
 import h3
 import data_structures
 from tqdm import tqdm
+from pp_enum import *
 
 class QuantityDem:
     """
@@ -76,8 +77,8 @@ class QuantityDem:
             map.add_cell(cell)
 
         # 记录属性
-        map.attributes.append("高程")
-        map.attributes.append("坡度")
+        map.attributes.append(StringConstant.ELEVATION.value)
+        map.attributes.append(StringConstant.SLOPE.value)
 
         return map
 

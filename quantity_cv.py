@@ -5,6 +5,7 @@ from rasterio_utils import RasterioUtils
 from statistics import stdev, mean
 from attribute_structures import ElevationCoefficientOfVariation
 from tqdm import tqdm
+from pp_enum import *
 
 class QuantityCV:
     """
@@ -77,7 +78,7 @@ class QuantityCV:
                         cell.attribute.append(ElevationCoefficientOfVariation(None))
             
             # 记录属性
-            map.attributes.append("高程变异系数")
+            map.attributes.append(StringConstant.CV.value)
 
             return map
 
