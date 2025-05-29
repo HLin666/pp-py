@@ -4,7 +4,7 @@ from rasterio_utils import RasterioUtils
 import h3
 import data_structures
 from tqdm import tqdm
-from pp_enum import *
+import math
 
 class QuantityDem:
     """
@@ -22,16 +22,78 @@ class QuantityDem:
         return sum_elev / count if count > 0 else None 
 
     def calculate_center_slope(h, vertex_elevation, center_elev):
-        """计算中心坡度"""
-        if center_elev is None:
+        """
+        使用Horn算法计算H3六边形单元的坡度
+        
+        参数:
+        h: str - H3单元索引
+        vertex_elevation: List[float] - 六边形顶点的高程值列表
+        center_elev: float - 中心点高程值
+        
+        返回:
+        float: 坡度值（度），如果数据不足则返回None
+        """
+        if center_elev is None or len(vertex_elevation) != 6:
             return None
-        slope_sum = 0
-        count = 0
-        for elev in vertex_elevation:
+            
+        # 获取H3单元格大小
+        cell_size = h3.edge_length(h3.h3_get_resolution(h), unit='m')
+        if cell_size == 0:
+            return None
+            
+        # 构建3x3高程矩阵，中心为当前单元格中心点
+        elev_matrix = [[None, None, None],
+                      [None, center_elev, None],
+                      [None, None, None]]
+                      
+        # H3六边形顶点在3x3矩阵中的位置映射（顺时针排列，从顶部开始）
+        # 0: 上, 1: 右上, 2: 右下, 3: 下, 4: 左下, 5: 左上
+        vertex_positions = [
+            (0, 1),  # 上
+            (0, 2),  # 右上
+            (2, 2),  # 右下
+            (2, 1),  # 下
+            (2, 0),  # 左下
+            (0, 0)   # 左上
+        ]
+        
+        # 填充顶点高程值
+        valid_points = 0
+        for i, elev in enumerate(vertex_elevation):
             if elev is not None:
-                slope_sum += abs(center_elev - elev) / h3.edge_length(h3.h3_get_resolution(h), unit='m')
-                count += 1
-        return slope_sum / count if count > 0 else None
+                row, col = vertex_positions[i]
+                elev_matrix[row][col] = elev
+                valid_points += 1
+                
+        # 需要至少4个有效点（包括中心点）才能计算坡度
+        if valid_points < 3:  # 3个顶点 + 1个中心点
+            return None
+            
+        # 计算x方向和y方向的梯度
+        # Horn算法的权重系数
+        dz_dx = (
+            (elev_matrix[0][2] if elev_matrix[0][2] is not None else center_elev) +
+            2 * (elev_matrix[1][2] if elev_matrix[1][2] is not None else center_elev) +
+            (elev_matrix[2][2] if elev_matrix[2][2] is not None else center_elev) -
+            (elev_matrix[0][0] if elev_matrix[0][0] is not None else center_elev) -
+            2 * (elev_matrix[1][0] if elev_matrix[1][0] is not None else center_elev) -
+            (elev_matrix[2][0] if elev_matrix[2][0] is not None else center_elev)
+        ) / (8.0 * cell_size)
+        
+        dz_dy = (
+            (elev_matrix[2][0] if elev_matrix[2][0] is not None else center_elev) +
+            2 * (elev_matrix[2][1] if elev_matrix[2][1] is not None else center_elev) +
+            (elev_matrix[2][2] if elev_matrix[2][2] is not None else center_elev) -
+            (elev_matrix[0][0] if elev_matrix[0][0] is not None else center_elev) -
+            2 * (elev_matrix[0][1] if elev_matrix[0][1] is not None else center_elev) -
+            (elev_matrix[0][2] if elev_matrix[0][2] is not None else center_elev)
+        ) / (8.0 * cell_size)
+        
+        # 计算坡度（度）
+        slope_rad = math.atan(math.sqrt(dz_dx * dz_dx + dz_dy * dz_dy))
+        slope_deg = math.degrees(slope_rad)
+        
+        return slope_deg
 
     def quantity_dem(dem_path, resolution):
         # 读取DEM数据(wgs84坐标系)
@@ -77,13 +139,13 @@ class QuantityDem:
             map.add_cell(cell)
 
         # 记录属性
-        map.attributes.append(StringConstant.ELEVATION.value)
-        map.attributes.append(StringConstant.SLOPE.value)
+        map.attributes.append("高程")
+        map.attributes.append("坡度")
 
         return map
 
 if __name__ == '__main__':
-    map = QuantityDem.quantity_dem(r"/home/cc/mydata/玄武区dem.tif", resolution=11)
+    map = QuantityDem.quantity_dem(r"C:\Users\wyj517\Desktop\pp-py5.23\玄武区.tif", resolution=11)
 
     # 将 map 对象序列化并写入二进制文件
     with open('data/玄武区.bin', 'wb') as f:
