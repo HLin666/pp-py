@@ -14,13 +14,16 @@ from map2shp import write_cells_to_shp
 import os
 import h3
 from attribute_structures import *
+import geopandas as gpd
+from quantity_roadnet import *
+from pp import *
 
 
 # with open('data/玄武区.bin', 'rb') as f:
 #     map = pickle.load(f)
 
 
-def quantity_test(dem_path,resolution,road_shp_path):
+def quantity_test(dem_path,resolution,road_shp_path=None):
     """量化测试"""
     """
     dem_path = r"/home/cc/mydata/玄武区dem.tif"
@@ -34,7 +37,9 @@ def quantity_test(dem_path,resolution,road_shp_path):
     QuantityExposure.quantity_exposure(map)
     QuantityRelief.quantity_relief(map,dem_path)
     QuantityRoughness.quantity_roughness(map,dem_path)
-    QuantityRoad.quantity_road(map,road_shp_path) # 量化路网
+    if road_shp_path is not None:
+        # 量化道路
+        QuantityRoad.quantity_road(map, road_shp_path)
     return map
 
 def fullload_run(map):
@@ -87,19 +92,58 @@ def fullload_run(map):
         cell.attribute.append(soil)
         cell.attribute.append(building)
 
-if __name__ == "__main__":
-    dem_path = r"/home/cc/mydata/玄武区dem.tif"
-    road_shp_path = r"/home/cc/mydata/road_shp/road.shp"
-    resolution = 11
-    map = quantity_test(dem_path,resolution,road_shp_path)
-    fullload_run(map)
-    # 暂停
-    input("Press Enter to continue...")
+def generate_gdftxt(road_shp_path, output_file = 'data/output/gdf.txt'):
+    """将GeoDataFrame输出为txt文件"""
+    gdf = gpd.read_file(road_shp_path)
+    with open(output_file, 'w') as f:
+        f.write(gdf.to_string())
+    
+def save_map(map, bin_path='data/output/玄武区.bin'):
+    """使用pickle保存map"""
+    with open(bin_path, 'wb') as f:
+        pickle.dump(map, f)
 
-    # with open('data/玄武区.bin', 'wb') as f:
-    #     pickle.dump(map, f)
-    # # 转为shp
-    # output_dir = "data/output_shp"
-    # os.makedirs(output_dir, exist_ok=True)
-    # shp_path = os.path.join(output_dir, "玄武区.shp")
-    # write_cells_to_shp(map, shp_path)
+def load_map(bin_path='data/玄武区.bin'):
+    """使用pickle加载map"""
+    with open(bin_path, 'rb') as f:
+        map = pickle.load(f)
+    return map
+
+def tansfer_map_to_shp(map, output_path='data/output/玄武区.shp'):
+    """将map对象转换为shp文件"""
+    write_cells_to_shp(map, output_path)
+
+if __name__ == "__main__":
+    # dem_path = 'data/玄武区/dem.tif'
+    road_shp_path = 'data/mock1/road_shp/mock_road.shp'
+    resolution = GlobalConfig().h3_resolution
+    junction_shp = 'data/mock1/junction_shp/mock_junction.shp'
+    """生成六角格网"""
+    # 获取覆盖区域的 H3 六边形格网
+    all_h3_indices = h3.polyfill_geojson({
+        "type": "Polygon",
+        "coordinates": [[
+            [118.80411, 32.0149],
+            [118.80411, 31.98122],
+            [118.86597, 31.98122],
+            [118.86597, 32.0149],
+            [118.80411, 32.0149]
+        ]]
+    }, resolution)
+    # 创建 Map 对象
+    map = Map()
+    # 遍历所有 H3 索引，创建 Cell 对象并添加到 Map
+    for h in all_h3_indices:
+        cell = Cell(h)
+        map.add_cell(cell)
+
+    road_adjacency_list = generate_road_adjacency_list(road_shp_path, resolution)
+    quantity_by_road_adjacency_list(road_adjacency_list, map)
+    quantity_junctions(junction_shp, map)
+    tansfer_map_to_shp(map, 'output/mock1/mock.shp')
+
+    """pp路径规划"""
+    start = (31.999027,118.810660)
+    end = (31.983647,118.841108)
+    path = pp(map, start, end, road_adjacency_list)
+    tansfer_map_to_shp(path, 'output/mock1/path.shp')

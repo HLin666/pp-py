@@ -84,4 +84,4 @@ class RoadTopologyType(Enum):
     """
     NOWAY = 0 # 无道路
     ISOLATEDWAY = 1 # 不可穿越的道路
-    CONNECTEDWAY = 2 # 可穿越的道路
+    ACCESSIBLE = 2 # 可穿越的道路

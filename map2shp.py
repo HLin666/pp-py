@@ -29,6 +29,7 @@ def write_cells_to_shp(map, shp_path):
         shp.field("slope", "F", decimal=2)
         shp.field("terrain", "N", decimal=0)
         shp.field("road_topology_type", "N", decimal=0)
+        shp.field("is_roadpoint", "N", decimal=0)
 
         # 动态定义字段
         defined_fields = set()
@@ -59,6 +60,7 @@ def write_cells_to_shp(map, shp_path):
                 cell.slope,
                 max(cell.terrain, key=cell.terrain.get) if cell.terrain else None,
                 cell.road_topology_type,
+                1 if cell.is_roadpoint else 0
             ]
             for attr in cell.attribute:
                 if isinstance(attr, ElevationCoefficientOfVariation):

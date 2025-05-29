@@ -2,6 +2,11 @@ import h3
 from abc import ABC, abstractmethod
 from pp_enum import *
 
+# 全局配置类
+class GlobalConfig:
+    def __init__(self):
+        self.h3_resolution = 11         # 地图对象
+
 class Map:
     def __init__(self):
         self.map_range = []         # 地图范围，多边形坐标数组 [(x1, y1), (x2, y2), ...]
@@ -10,7 +15,6 @@ class Map:
 
     def add_cell(self, cell):
         self.cells[cell.h3_index] = cell
-
 
 class Cell:
     def __init__(self, h3_index):
@@ -29,7 +33,8 @@ class Cell:
         self.init_neighbor()          # 初始化cell的邻接cell的索引
 
         # 道路矢量量化拓扑属性
-        self.road_topology_type = RoadTopologyType.NOWAY.value   # 道路拓扑类型，0-无道路，1-不可穿越的道路，2-可穿越的道路
+        self.road_topology_type = RoadTopologyType.NOWAY.value   # 道路拓扑类型
+        self.is_roadpoint = False
 
         # dem量化属性
         self.elevation = None         # 高程值

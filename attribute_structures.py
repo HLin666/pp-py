@@ -1,5 +1,10 @@
 from data_structures import Attribute, SubAttribute
 
+class Elevation(Attribute):
+    """高程属性"""
+    def __init__(self, value):
+        super().__init__(value)
+
 class Slope(Attribute):
     """坡度属性"""
     def __init__(self, value):
@@ -178,4 +183,31 @@ if __name__ == '__main__':
     print(f"平均植被高度: {vegetation.get_sub_attribute(Vegetation.AverageVegetationHeight).get_value()}")
     print(f"平均植株胸径: {vegetation.get_sub_attribute(Vegetation.AveragePlantDiameter).get_value()}")
     print(f"林冠层郁闭度: {vegetation.get_sub_attribute(Vegetation.CanopyClosure).get_value()}")
+    # 土壤属性示例代码
+    soil = Soil("土壤")
+    soil_type = Soil.SoilType("粘土")
+    soil_hardness = Soil.SoilHardness(1.5)
+    soil_bearing_capacity = Soil.SoilBearingCapacity(200.0)
+    surface_soil_thickness = Soil.SurfaceSoilThickness(0.5)
+    soil.add_sub_attribute(soil_type)
+    soil.add_sub_attribute(soil_hardness)
+    soil.add_sub_attribute(soil_bearing_capacity)
+    soil.add_sub_attribute(surface_soil_thickness)
+    print(f"土壤属性: {soil.get_value()}")
+    print(f"土壤类型: {soil.get_sub_attribute(Soil.SoilType).get_value()}")
+    print(f"土壤硬度: {soil.get_sub_attribute(Soil.SoilHardness).get_value()}")
+    print(f"土壤承载力: {soil.get_sub_attribute(Soil.SoilBearingCapacity).get_value()}")
+    print(f"表层土厚度: {soil.get_sub_attribute(Soil.SurfaceSoilThickness).get_value()}")
+    # 建筑物属性示例代码
+    building = Building("建筑物")
+    building_type = Building.BuildingType("高层建筑")
+    building_hardness = Building.BuildingHardness(2.0)
+    building_destructibility = Building.BuildingDestructibility("可破坏")
+    building.add_sub_attribute(building_type)
+    building.add_sub_attribute(building_hardness)
+    building.add_sub_attribute(building_destructibility)
+    print(f"建筑物属性: {building.get_value()}")
+    print(f"建筑物类型: {building.get_sub_attribute(Building.BuildingType).get_value()}")
+    print(f"建筑物硬度: {building.get_sub_attribute(Building.BuildingHardness).get_value()}")
+    print(f"建筑物可破坏性: {building.get_sub_attribute(Building.BuildingDestructibility).get_value()}")
     

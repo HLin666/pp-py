@@ -50,12 +50,12 @@ class QuantityTerrain:
 
 if __name__ == '__main__':
     # 读取地图对象
-    with open('玄武区.bin', 'rb') as f:
+    with open('data/玄武区.bin', 'rb') as f:
         map = pickle.load(f)
     
     # 量化地形
     map = QuantityTerrain.quantity_terrain(map, r"/home/cc/mydata/玄武区地形.tif")
     
     # 将 map 对象序列化并写入二进制文件
-    with open('玄武区_地形.bin', 'wb') as f:
+    with open('data/玄武区_地形.bin', 'wb') as f:
         pickle.dump(map, f)

@@ -4,6 +4,7 @@ from shapely.geometry import LineString, MultiLineString
 import h3
 from pp_enum import *
 import tqdm
+from data_structures import *
 
 class QuantityRoad:
 
@@ -51,15 +52,15 @@ class QuantityRoad:
         # 遍历线段，获取这个线状矢量文件中所有线段所跨越的所有单元索引
         road_cellindex_set = set()
         for line in line_segments:
-            start_index = h3.geo_to_h3(line[0][0], line[0][1], 11) # TODO：这里写死了，可以用枚举类来代替（分辨率统一），或者用入参（分辨率不统一）
-            end_index = h3.geo_to_h3(line[1][0], line[1][1], 11)
+            start_index = h3.geo_to_h3(line[0][0], line[0][1], GlobalConfig().h3_resolution)
+            end_index = h3.geo_to_h3(line[1][0], line[1][1], GlobalConfig().h3_resolution)
             index_set = h3.h3_line(start_index, end_index)
             road_cellindex_set.update(index_set)
         # 匹配map中的单元索引，修改cell的道路拓扑属性
         for h3_index in tqdm.tqdm(road_cellindex_set, desc="量化道路："):
             if h3_index in map.cells:
                 cell = map.cells[h3_index]
-                cell.road_topology_type = RoadTopologyType.CONNECTEDWAY.value  # TODO：默认先设置为可穿越的道路
+                cell.road_topology_type = RoadTopologyType.ACCESSIBLE.value  # TODO：默认先设置为可穿越的道路
 
 # 使用示例
 if __name__ == "__main__":
