@@ -7,8 +7,6 @@ def generate_road_adjacency_list(shp_file_path, h3_resolution):
     """读取矢量路网,筛选出notpassbale的道路,最后生成矢量路网邻接表"""
     # 读取shp文件
     gdf = gpd.read_file(shp_file_path)
-    # 取出所有的线要素
-    lines = gdf.geometry[gdf.geometry.type == 'LineString']
     # 整个矢量路网的h3索引数组
     h3_indexes = []
     # 遍历gdf
@@ -16,7 +14,7 @@ def generate_road_adjacency_list(shp_file_path, h3_resolution):
         # 检查几何类型是否为线要素
         if row.geometry.type != 'LineString':
             continue
-        # 检查fclass属性是否为footway
+        # 检查fclass属性是否为notpassable
         if row['fclass'] != 'notpassable':
             continue
         # 单个线要素的h3索引数组
@@ -58,12 +56,14 @@ def quantity_by_road_adjacency_list(road_adjacency_list, map):
     for current_index, neighbor_indexes in tqdm(road_adjacency_list.items(), desc="量化不可通行的路网"):
         for neighbor_index in neighbor_indexes:
             line_indexes = h3.h3_line(current_index, neighbor_index)
+            # 两个端点也加入进去
+            line_indexes.append(current_index)
+            line_indexes.append(neighbor_index)
             # 遍历线上的h3索引
             for line_index in line_indexes:
                 if line_index not in map.cells:
                     continue
-                map.cells[line_index].is_roadpoint = True
-                map.cells[line_index].road_topology_type = RoadTopologyType.ISOLATEDWAY.value
+                map.cells[line_index].road_type = RoadType.HIGHWAY.value
 
 def quantity_junctions(junction_shp, map):
     """量化连接点"""
@@ -80,13 +80,14 @@ def quantity_junctions(junction_shp, map):
         h3_index = h3.geo_to_h3(point[1], point[0], GlobalConfig().h3_resolution)
         # 如果h3索引在map中，则设置为连接点
         if h3_index in map.cells:
-            map.cells[h3_index].is_junction = True
-            map.cells[h3_index].road_topology_type = RoadTopologyType.ACCESSIBLE.value
+            map.cells[h3_index].road_type = RoadType.ENTRYWAY.value
 
 if __name__ == "__main__":
-    road_shp_path = r"/home/cc/mydata/mock_road/mock_road.shp"
+    road_shp_path = 'data/mock1/road_shp2/mock_road.shp'
     h3_resolution = GlobalConfig().h3_resolution
     road_adjacency_list = generate_road_adjacency_list(road_shp_path, h3_resolution)
+    for h3_index, neighbors in road_adjacency_list.items():
+        print(f"{h3_index}: {neighbors}")
     
 
 

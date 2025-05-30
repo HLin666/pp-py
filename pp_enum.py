@@ -78,10 +78,11 @@ class AttributeIndex(Enum):
     CURVATURE = 3
     EXPOSURE = 4
 
-class RoadTopologyType(Enum):
+class RoadType(Enum):
     """
     道路拓扑类型枚举类
     """
     NOWAY = 0 # 无道路
-    ISOLATEDWAY = 1 # 不可穿越的道路
-    ACCESSIBLE = 2 # 可穿越的道路
+    NORMALWAY = 1 # 普通道路
+    HIGHWAY = 2 # 高速路
+    ENTRYWAY = 3 # 入口道路

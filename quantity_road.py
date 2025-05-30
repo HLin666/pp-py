@@ -60,7 +60,7 @@ class QuantityRoad:
         for h3_index in tqdm.tqdm(road_cellindex_set, desc="量化道路："):
             if h3_index in map.cells:
                 cell = map.cells[h3_index]
-                cell.road_topology_type = RoadTopologyType.ACCESSIBLE.value  # TODO：默认先设置为可穿越的道路
+                cell.road_type = RoadType.NORMALWAY.value  # TODO：默认先设置为可穿越的道路
 
 # 使用示例
 if __name__ == "__main__":

@@ -4,55 +4,32 @@ from data_structures import *
 from pp_enum import *
 from quantity_roadnet import *
 
-def init_attributes_index(map):
-    """
-    初始化属性索引
-    :param map: 地图对象
-    :return: attributes_index: 属性索引列表
-    """
-    # 初始化一个元素为-1的属性索引列表
-    attributes_index = 3 * [-1]
-    flag = 0
-    # 遍历地图的属性列表
-    for i, attribute in enumerate(map.attributes):
-        if attribute == StringConstant.ELEVATION.value or attribute == StringConstant.SLOPE.value:
-            flag += 1
-        elif attribute == StringConstant.CV.value:
-            attributes_index[AttributeIndex.CV.value]=i-flag
-        elif attribute == StringConstant.RELIEF.value:
-            attributes_index[AttributeIndex.RELIEF.value]=i-flag
-        elif attribute == StringConstant.ROUGHNESS.value:
-            attributes_index[AttributeIndex.ROUGHNESS.value]=i-flag
-    return attributes_index
-
-def reject_cell_by_cv(neighbor_cell, cv_index, cv_threshold):
-    if neighbor_cell.attribute[cv_index].value == None:
-        return True
+def reject_cell_by_cv(neighbor_cell, map, cv_threshold):
+    if(StringConstant.CV.value not in map.attributes):
+        return True # 未量化cv，直接拒绝
+    cv_index = map.attributes[StringConstant.CV.value]
     if cv_index != -1 and neighbor_cell.attribute[cv_index].value > cv_threshold:
-        return True
+        return True # cv值超过阈值，拒绝
     return False
 
-def reject_cell_by_road(neighbor_cell):
-    if neighbor_cell.road_topology_type == RoadTopologyType.ISOLATEDWAY.value:
+def reject_cell_by_road(current_cell, neighbor_cell):
+    # 这里不是只判断neighbor的原因是防止从不可通行的路网点下车了
+    if neighbor_cell.road_type == RoadType.HIGHWAY.value or current_cell == RoadType.HIGHWAY.value:
         return True
     else:
         return False
 
-def reject_cell(neighbor_cell, attributes_index):
+def reject_cell(current_cell, neighbor_cell, map):
     """
     判断一个cell是否被拒绝
-    :param cell: Cell对象
-    :param map_attributes: 地图属性列表
-    :param attributes_index: 属性索引列表
+    :param current_cell: 当前节点
+    :param neighbor_cell: 邻居
+    :param map: 地图对象
     :return: bool
     """
-    # 模拟阈值
-    cv_threshold = 0.1
-    # TODO
-    # cv_index = attributes_index[AttributeIndex.CV.value]
-    # if reject_cell_by_cv(neighbor_cell, cv_index, cv_threshold):
+    # if reject_cell_by_cv(neighbor_cell, map, cv_threshold=0.1):
     #     return True
-    if reject_cell_by_road(neighbor_cell):
+    if reject_cell_by_road(current_cell, neighbor_cell):
         return True
     return False
 
@@ -63,7 +40,7 @@ def reward_cell(neighbor_cell, g_increment):
     :param g: 当前cell的g值
     :return: None
     """
-    if neighbor_cell.road_topology_type == RoadTopologyType.ACCESSIBLE.value:
+    if neighbor_cell.road_type == RoadType.NORMALWAY.value:
         g_increment *= 0.4
 
 def roadpoint_enhance(current_cell, road_adjacency_list, open_set, end_cell):
@@ -76,7 +53,7 @@ def roadpoint_enhance(current_cell, road_adjacency_list, open_set, end_cell):
     :return: None
     """
     # 如果当前cell是路口，则增强其邻接cell的g值
-    if current_cell.is_roadpoint and current_cell.road_topology_type != RoadTopologyType.ISOLATEDWAY.value:
+    if current_cell.road_type == RoadType.HIGHWAY.value or current_cell.road_type == RoadType.ENTRYWAY.value: # 是路网点
         # 检查current_cell.h3_index是否在路网邻接表中
         if current_cell.h3_index in road_adjacency_list:
             # 遍历当前cell的邻接cell
@@ -89,6 +66,7 @@ def roadpoint_enhance(current_cell, road_adjacency_list, open_set, end_cell):
                 neighbor_cell.h = h3.point_dist(neighbor_cell.center, end_cell.center)
                 neighbor_cell.f = neighbor_cell.g + neighbor_cell.h
                 neighbor_cell.father = current_cell  # 设置父节点
+                neighbor_cell.road_type = RoadType.HIGHWAY.value  # 少量这个会有bug
                 open_set.add(neighbor_cell) # TODO：目前还没法剔除open_set中的冗余节点，同一个经纬位置上可能会有路网点和普通点重合。
 
 def pp(map, start, end, road_adjacency_list):
@@ -131,7 +109,6 @@ def pp(map, start, end, road_adjacency_list):
             open_set.add(map.cells[neighbor])
     closed_set.add(start_cell)
     current_cell = None # 当前节点
-    attributes_index = init_attributes_index(map) # 属性索引表
     # 开始A*算法
     while open_set:
         # 找到f值最小的节点
@@ -142,12 +119,12 @@ def pp(map, start, end, road_adjacency_list):
             break  # 找到终点，退出循环
         open_set.remove(current_cell)
         closed_set.add(current_cell)
+        # 路网点增强
+        roadpoint_enhance(current_cell, road_adjacency_list, open_set, end_cell)
         for neighbor in current_cell.neighbors:
             if neighbor in map.cells and map.cells[neighbor] not in closed_set:
-                # 路网点增强
-                roadpoint_enhance(current_cell, road_adjacency_list, open_set, end_cell)
                 # 拒绝策略
-                if reject_cell(map.cells[neighbor], attributes_index):
+                if reject_cell(current_cell, map.cells[neighbor], map):
                     continue
                 # 计算g值的增量
                 g_increment = h3.point_dist(current_cell.center, map.cells[neighbor].center)
@@ -171,8 +148,6 @@ def pp(map, start, end, road_adjacency_list):
 if __name__ == "__main__":
     with open('data/玄武区.bin', 'rb') as f:
         map = pickle.load(f)
-    # start = (32.052653,118.822807)
-    # end = (32.074446,118.814145)
     start = (32.056379,118.804974)
     end = (32.069695,118.801675)
     roadnet = None

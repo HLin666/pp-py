@@ -11,7 +11,7 @@ class Map:
     def __init__(self):
         self.map_range = []         # 地图范围，多边形坐标数组 [(x1, y1), (x2, y2), ...]
         self.cells = {}             # 存储Cell对象的哈希表，键为h3_index，值为Cell对象
-        self.attributes = []        # 已经量化的属性，存储字符串
+        self.attributes = {}        # 已经量化的属性，存储字符串
 
     def add_cell(self, cell):
         self.cells[cell.h3_index] = cell
@@ -33,8 +33,7 @@ class Cell:
         self.init_neighbor()          # 初始化cell的邻接cell的索引
 
         # 道路矢量量化拓扑属性
-        self.road_topology_type = RoadTopologyType.NOWAY.value   # 道路拓扑类型
-        self.is_roadpoint = False
+        self.road_type = RoadType.NOWAY.value   # 道路类型
 
         # dem量化属性
         self.elevation = None         # 高程值

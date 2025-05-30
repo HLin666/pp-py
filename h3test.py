@@ -115,7 +115,7 @@ def tansfer_map_to_shp(map, output_path='data/output/玄武区.shp'):
 
 if __name__ == "__main__":
     # dem_path = 'data/玄武区/dem.tif'
-    road_shp_path = 'data/mock1/road_shp/mock_road.shp'
+    road_shp_path = 'data/mock1/road_shp1/mock_road.shp'
     resolution = GlobalConfig().h3_resolution
     junction_shp = 'data/mock1/junction_shp/mock_junction.shp'
     """生成六角格网"""
@@ -140,10 +140,16 @@ if __name__ == "__main__":
     road_adjacency_list = generate_road_adjacency_list(road_shp_path, resolution)
     quantity_by_road_adjacency_list(road_adjacency_list, map)
     quantity_junctions(junction_shp, map)
+    # 将map中cels中的元素打印到txt中
+    with open('output/cells.txt', 'w') as f:
+        for h3_index, cell in map.cells.items():
+            f.write(f"{h3_index}: {cell.road_type}\n")
+        
     tansfer_map_to_shp(map, 'output/mock1/mock.shp')
 
     """pp路径规划"""
-    start = (31.999027,118.810660)
-    end = (31.983647,118.841108)
+    start = (31.999183,118.810169)
+    end = (31.984932,118.840786)
     path = pp(map, start, end, road_adjacency_list)
-    tansfer_map_to_shp(path, 'output/mock1/path.shp')
+    tansfer_map_to_shp(path, 'output/mock1/path1.shp')
+    # generate_gdftxt(road_shp_path='data/mock1/road_shp2/mock_road.shp', output_file='output/gdf2.txt')
