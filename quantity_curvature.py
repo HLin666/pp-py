@@ -259,7 +259,11 @@ class QuantityCurvature:
             QuantityCurvature.quantity_curvature_neighbor(map, curvature_type)
             
         # 记录属性
-        map.attributes.append(StringConstant.CURVATURE.value)
+        if StringConstant.CURVATURE.value not in map.attributes:
+            map.attributes[StringConstant.CURVATURE.value] = len(map.attributes)
+        else:
+            # TODO
+            print(f"警告: {StringConstant.CURVATURE.value} 已经存在于地图属性中")
             
         return map
 

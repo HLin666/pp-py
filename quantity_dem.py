@@ -138,10 +138,6 @@ class QuantityDem:
             cell.slope = center_slope
             map.add_cell(cell)
 
-        # 记录属性
-        map.attributes.append("高程")
-        map.attributes.append("坡度")
-
         return map
 
 if __name__ == '__main__':

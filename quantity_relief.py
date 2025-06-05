@@ -75,7 +75,11 @@ class QuantityRelief:
                         cell.attribute.append(relief)
             
             # 记录属性
-            map.attributes.append(StringConstant.RELIEF.value)
+            if StringConstant.RELIEF.value not in map.attributes:
+                map.attributes[StringConstant.RELIEF.value] = len(map.attributes)
+            else:
+                # TODO
+                print(f"警告: {StringConstant.RELIEF.value} 已经存在于地图属性中")
 
             return map
 

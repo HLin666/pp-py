@@ -78,7 +78,11 @@ class QuantityRoughness:
                         cell.attribute.append(roughness)
             
             # 记录属性
-            map.attributes.append(StringConstant.ROUGHNESS.value)
+            if StringConstant.ROUGHNESS.value not in map.attributes:
+                map.attributes[StringConstant.ROUGHNESS.value] = len(map.attributes)
+            else:
+                # TODO
+                print(f"警告: {StringConstant.ROUGHNESS.value} 已经存在于地图属性中")
             
             return map
 

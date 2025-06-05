@@ -78,7 +78,11 @@ class QuantityCV:
                         cell.attribute.append(ElevationCoefficientOfVariation(None))
             
             # 记录属性
-            map.attributes.append(StringConstant.CV.value)
+            if StringConstant.CV.value not in map.attributes:
+                map.attributes[StringConstant.CV.value] = len(map.attributes)
+            else:
+                # TODO
+                print(f"警告: {StringConstant.CV.value} 已经存在于地图属性中")
 
             return map
 

@@ -114,42 +114,6 @@ def tansfer_map_to_shp(map, output_path='data/output/玄武区.shp'):
     write_cells_to_shp(map, output_path)
 
 if __name__ == "__main__":
-    # dem_path = 'data/玄武区/dem.tif'
-    road_shp_path = 'data/mock1/road_shp1/mock_road.shp'
-    resolution = GlobalConfig().h3_resolution
-    junction_shp = 'data/mock1/junction_shp/mock_junction.shp'
-    """生成六角格网"""
-    # 获取覆盖区域的 H3 六边形格网
-    all_h3_indices = h3.polyfill_geojson({
-        "type": "Polygon",
-        "coordinates": [[
-            [118.80411, 32.0149],
-            [118.80411, 31.98122],
-            [118.86597, 31.98122],
-            [118.86597, 32.0149],
-            [118.80411, 32.0149]
-        ]]
-    }, resolution)
-    # 创建 Map 对象
-    map = Map()
-    # 遍历所有 H3 索引，创建 Cell 对象并添加到 Map
-    for h in all_h3_indices:
-        cell = Cell(h)
-        map.add_cell(cell)
-
-    road_adjacency_list = generate_road_adjacency_list(road_shp_path, resolution)
-    quantity_by_road_adjacency_list(road_adjacency_list, map)
-    quantity_junctions(junction_shp, map)
-    # 将map中cels中的元素打印到txt中
-    with open('output/cells.txt', 'w') as f:
-        for h3_index, cell in map.cells.items():
-            f.write(f"{h3_index}: {cell.road_type}\n")
-        
-    tansfer_map_to_shp(map, 'output/mock1/mock.shp')
-
-    """pp路径规划"""
-    start = (31.999183,118.810169)
-    end = (31.984932,118.840786)
-    path = pp(map, start, end, road_adjacency_list)
-    tansfer_map_to_shp(path, 'output/mock1/path1.shp')
-    # generate_gdftxt(road_shp_path='data/mock1/road_shp2/mock_road.shp', output_file='output/gdf2.txt')
+    dem_path = 'data/汤山/汤山dem.tif'
+    map = quantity_test(dem_path, 13)
+    write_cells_to_shp(map, 'output/汤山/汤山.shp')

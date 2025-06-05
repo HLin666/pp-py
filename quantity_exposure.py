@@ -219,7 +219,11 @@ class QuantityExposure:
             QuantityExposure.quantity_exposure_neighbor(map)
             
         # 记录属性
-        map.attributes.append(StringConstant.EXPOSURE.value)
+        if StringConstant.EXPOSURE.value not in map.attributes:
+            map.attributes[StringConstant.EXPOSURE.value] = len(map.attributes)
+        else:
+            # TODO
+            print(f"警告: {StringConstant.EXPOSURE.value} 已经存在于地图属性中")
             
         return map
 
