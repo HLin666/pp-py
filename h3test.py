@@ -126,6 +126,9 @@ if __name__ == "__main__":
     QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/wasteland.shp', GlobalConfig().h3_resolution)
     QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/water.shp', GlobalConfig().h3_resolution)
     write_cells_to_shp(map, 'output/汤山/汤山.shp')
+    save_map(map, 'output/汤山/汤山map.bin')
+    # 暂停
+    input("Press Enter to continue...")
     
     
 
