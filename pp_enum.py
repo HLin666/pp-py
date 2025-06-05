@@ -72,11 +72,21 @@ class AttributeIndex(Enum):
     """
     属性索引枚举类
     """
+    # dem相关
     CV = 0
     RELIEF = 1
     ROUGHNESS = 2
     CURVATURE = 3
     EXPOSURE = 4
+    # 其他地形
+    WATER = 5 # 水体
+    FOREST = 6 # 林地
+    GRASS = 7 # 草地
+    PLOWLAND = 8 # 耕地
+    SHRUBWOOD = 9 # 灌木
+    BUILDING = 10 # 建筑
+    WASTELAND = 11 # 荒地
+    ROAD = 12 # 道路
 
 class RoadType(Enum):
     """
@@ -84,5 +94,12 @@ class RoadType(Enum):
     """
     NOWAY = 0 # 无道路
     NORMALWAY = 1 # 普通道路
-    HIGHWAY = 2 # 高速路
+    HIGHWAY = 2 # 高速路    
     ENTRYWAY = 3 # 入口道路
+
+class HasAttribute(Enum):
+    """
+    是否具有属性枚举类
+    """
+    YES = 1
+    NO = 0

@@ -1,7 +1,7 @@
 import pickle
 import sys
 from pympler import asizeof
-from data_structures import Cell
+from data_structures import *
 from quantity_dem import QuantityDem
 from quantity_terrain import QuantityTerrain
 from quantity_cv import QuantityCV
@@ -17,6 +17,7 @@ from attribute_structures import *
 import geopandas as gpd
 from quantity_roadnet import *
 from pp import *
+from quantity_shp import *
 
 
 # with open('data/玄武区.bin', 'rb') as f:
@@ -115,5 +116,16 @@ def tansfer_map_to_shp(map, output_path='data/output/玄武区.shp'):
 
 if __name__ == "__main__":
     dem_path = 'data/汤山/汤山dem.tif'
-    map = quantity_test(dem_path, 13)
+    map = quantity_test(dem_path, GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/building.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/forest.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/grass.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/plowland.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/road.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/shrubwood.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/wasteland.shp', GlobalConfig().h3_resolution)
+    QuantityShp.quantity_shp(map, 'data/汤山/面状矢量/water.shp', GlobalConfig().h3_resolution)
     write_cells_to_shp(map, 'output/汤山/汤山.shp')
+    
+    
+

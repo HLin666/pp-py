@@ -5,7 +5,7 @@ from pp_enum import *
 # 全局配置类
 class GlobalConfig:
     def __init__(self):
-        self.h3_resolution = 11         # 地图对象
+        self.h3_resolution = 13         # 地图对象
 
 class Map:
     def __init__(self):
@@ -42,7 +42,8 @@ class Cell:
 
         # 其他属性
         self.attribute = []           # 属性数组 (存储Attribute对象)
-
+        self.show_attribute = None    # 存储一个属性枚举类对应的数字，主要方便可视化，不用于路径规划算法
+        
         # pp相关
         self.g = 0
         self.h = 0

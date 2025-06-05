@@ -35,36 +35,6 @@ class ElevationCoefficientOfVariation(Attribute):
     def __init__(self, value):
         super().__init__(value)
 
-class Water(Attribute):
-    """
-    水体属性
-    """
-    class WaterDepth(SubAttribute):
-        """水深子属性"""
-        def __init__(self, value):
-            super().__init__(value)
-
-    class WaterBottomGeology(SubAttribute):
-        """水底地质子属性"""
-        def __init__(self, value):
-            super().__init__(value)
-
-    class FlowSpeed(SubAttribute):
-        """流速子属性"""
-        def __init__(self, value):
-            super().__init__(value)
-    class WaterWidth(SubAttribute):
-        """水体宽度子属性"""
-        def __init__(self, value):
-            super().__init__(value)
-    class BankSteepness(SubAttribute):
-        """岸边陡峭程度子属性"""
-        def __init__(self, value):
-            super().__init__(value)
-
-    def __init__(self, value):
-        super().__init__(value)
-
 class Vegetation(Attribute):
     """
     植被属性
@@ -124,6 +94,33 @@ class Soil(Attribute):
     def __init__(self, value):
         super().__init__(value)
 
+class Water(Attribute):
+    """
+    水体属性
+    """
+    class WaterDepth(SubAttribute):
+        """水深子属性"""
+        def __init__(self, value):
+            super().__init__(value)
+
+    class WaterBottomGeology(SubAttribute):
+        """水底地质子属性"""
+        def __init__(self, value):
+            super().__init__(value)
+
+    class FlowSpeed(SubAttribute):
+        """流速子属性"""
+        def __init__(self, value):
+            super().__init__(value)
+    class WaterWidth(SubAttribute):
+        """水体宽度子属性"""
+        def __init__(self, value):
+            super().__init__(value)
+    class BankSteepness(SubAttribute):
+        """岸边陡峭程度子属性"""
+        def __init__(self, value):
+            super().__init__(value)
+
 class Building(Attribute):
     """
     建筑物属性
@@ -143,6 +140,41 @@ class Building(Attribute):
         def __init__(self, value):
             super().__init__(value)
 
+    def __init__(self, value):
+        super().__init__(value)
+
+class Forest(Attribute):
+    """
+    森林属性
+    """
+    def __init__(self, value):
+        super().__init__(value)
+
+class Grass(Attribute):
+    """
+    草地属性
+    """
+    def __init__(self, value):
+        super().__init__(value)
+
+class ShrubWood(Attribute):
+    """
+    灌木丛属性
+    """
+    def __init__(self, value):
+        super().__init__(value)
+
+class Plowland(Attribute):
+    """
+    耕地属性
+    """
+    def __init__(self, value):
+        super().__init__(value)
+
+class Wasteland(Attribute):
+    """
+    荒地属性
+    """
     def __init__(self, value):
         super().__init__(value)
 
